@@ -11,7 +11,7 @@ Then(/^tuist warms the cache of ([a-zA-Z]+)$/) do |target_name|
 end
 
 Then(/^tuist warms the cache with xcframeworks$/) do
-  system(@tuist, "cache", "warm", "--path", @dir, "--xcframeworks")
+  system(@tuist, "cache", "warm", "--path", @dir, "--xcframeworks", "--profile", "Release")
 end
 
 Then(/^tuist warms the cache with (device|simulator) xcframeworks$/) do |type|

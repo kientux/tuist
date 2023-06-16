@@ -104,6 +104,7 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
 
     // MARK: - Fileprivate
 
+    // swiftlint:disable function_body_length
     fileprivate func createXCFramework(
         buildTargets: [TargetReference],
         macCatalystSupportedTargets: [Target],
@@ -129,9 +130,10 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
 
         logger.notice("Caching to all cacheable targets as xcframeworks", metadata: .section)
         for productName in productNames {
-            var frameworkpaths = [AbsolutePath]()
+            var frameworkPaths = [AbsolutePath]()
+            var symbolPaths = [AbsolutePath]()
             if let simulatorArchivePath = simulatorArchivePath {
-                frameworkpaths.append(self.frameworkPath(
+                frameworkPaths.append(self.frameworkPath(
                     fromArchivePath: simulatorArchivePath,
                     productName: productName
                 ))
@@ -143,7 +145,7 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
                     .filter { $0.0.name == productName }
                     .forEach { _ in
                         if let macCatalystArchivePath = macCatalystArchivePath {
-                            frameworkpaths.append(self.frameworkPath(
+                            frameworkPaths.append(self.frameworkPath(
                                 fromArchivePath: macCatalystArchivePath,
                                 productName: productName
                             ))
@@ -152,16 +154,21 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
             }
 
             if let deviceArchivePath = deviceArchivePath {
-                frameworkpaths.append(self.frameworkPath(
+                frameworkPaths.append(self.frameworkPath(
                     fromArchivePath: deviceArchivePath,
                     productName: productName
                 ))
+                symbolPaths.append(self.dsymsPath(fromArchivePath: archivePath))
             }
+
+            print("frameworkPaths: \(frameworkPaths)")
+            print("symbolPaths: \(symbolPaths)")
 
             logger.notice("Caching \(productName).xcframework")
             let xcframeworkPath = outputDirectory.appending(component: "\(productName).xcframework")
             try await self.xcodeBuildController.createXCFramework(
-                frameworks: frameworkpaths,
+                frameworks: frameworkPaths,
+                symbols: symbolPaths,
                 output: xcframeworkPath
             )
             .printFormattedOutput()
@@ -172,6 +179,8 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
             )
         }
     }
+
+    // swiftlint:enable function_body_length
 
     fileprivate func getMacCatalystTargets(graph: Graph, scheme: Scheme) -> [Target] {
         guard let buildTargets = scheme.buildAction?.targets else { return [] }
@@ -248,6 +257,13 @@ public final class CacheXCFrameworkBuilder: CacheArtifactBuilding {
     ///   - productName: Product name.
     fileprivate func frameworkPath(fromArchivePath archivePath: AbsolutePath, productName: String) -> AbsolutePath {
         archivePath.appending(RelativePath("Products/Library/Frameworks/\(productName).framework"))
+    }
+
+    /// Returns the path to dSYMs inside the archive.
+    /// - Parameters:
+    ///   - archivePath: Path to the .xcarchive.
+    fileprivate func dsymsPath(fromArchivePath archivePath: AbsolutePath) -> AbsolutePath {
+        archivePath.appending(RelativePath("dSYMs"))
     }
 }
 

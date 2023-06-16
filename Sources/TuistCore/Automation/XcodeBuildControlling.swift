@@ -63,8 +63,9 @@ public protocol XcodeBuildControlling {
     /// Creates an .xcframework combining the list of given frameworks.
     /// - Parameters:
     ///   - frameworks: Frameworks to be combined.
+    ///   - symbols: dSYMs to be combined.
     ///   - output: Path to the output .xcframework.
-    func createXCFramework(frameworks: [AbsolutePath], output: AbsolutePath)
+    func createXCFramework(frameworks: [AbsolutePath], symbols: [AbsolutePath], output: AbsolutePath)
         -> AsyncThrowingStream<SystemEvent<XcodeBuildOutput>, Error>
 
     /// Gets the build settings of a scheme targets.

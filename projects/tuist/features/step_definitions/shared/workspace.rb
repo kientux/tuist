@@ -12,7 +12,7 @@ And(/I have a working directory/) do
 end
 
 After do |_scenario|
-  FileUtils.rm_r(@dir) unless @dir.nil?
-  FileUtils.rm_r(@cache_dir) unless @cache_dir.nil?
-  FileUtils.rm_r(@derived_data_path) unless @derived_data_path.nil?
+  # FileUtils.rm_r(@dir) unless @dir.nil?
+  # FileUtils.rm_r(@cache_dir) unless @cache_dir.nil?
+  # FileUtils.rm_r(@derived_data_path) unless @derived_data_path.nil?
 end

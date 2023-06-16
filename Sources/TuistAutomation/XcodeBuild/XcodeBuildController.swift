@@ -156,12 +156,25 @@ public final class XcodeBuildController: XcodeBuildControlling {
 
     public func createXCFramework(
         frameworks: [AbsolutePath],
+        symbols: [AbsolutePath],
         output: AbsolutePath
     ) -> AsyncThrowingStream<SystemEvent<XcodeBuildOutput>, Error> {
         var command = ["/usr/bin/xcrun", "xcodebuild", "-create-xcframework"]
-        command.append(contentsOf: frameworks.flatMap { ["-framework", $0.pathString] })
+        if frameworks.count == symbols.count {
+            for index in frameworks.indices {
+                command.append(contentsOf: [
+                    "-framework",
+                    frameworks[index].pathString,
+                    "-debug-symbols",
+                    symbols[index].pathString,
+                ])
+            }
+        } else {
+            command.append(contentsOf: frameworks.flatMap { ["-framework", $0.pathString] })
+        }
         command.append(contentsOf: ["-output", output.pathString])
         command.append("-allow-internal-distribution")
+        print("COMMAND: \(command)")
         return run(command: command, isVerbose: environment.isVerbose)
     }
 

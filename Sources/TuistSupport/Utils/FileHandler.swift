@@ -145,7 +145,7 @@ public class FileHandler: FileHandling {
     }
 
     public func inTemporaryDirectory(_ closure: @escaping (AbsolutePath) async throws -> Void) async throws {
-        let directory = try TemporaryDirectory(removeTreeOnDeinit: true)
+        let directory = try TemporaryDirectory(removeTreeOnDeinit: false)
         try await closure(directory.path)
     }
 
